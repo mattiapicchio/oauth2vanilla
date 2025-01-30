@@ -12,6 +12,8 @@ export const redirectToGoogleAuth = () => {
     responseType,
   )}&scope=${encodeURIComponent(scope)}&access_type=${encodeURIComponent(accessType)}`
 
+  // TODO: extract router.query.code
+
   // Redirect the user to Google's OAuth 2.0 endpoint
   window.location.href = authUrl
 }
