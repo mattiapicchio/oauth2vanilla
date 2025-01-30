@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent; /* remove Android highlights taps on links */
+    @apply text-body text-black antialiased;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply container mx-auto px-4 pb-40 pt-6 sm:px-8 sm:pt-14 xl:px-12;
+  }
+}
+
+@layer base {
+  /* ----------------------------------------------------------------- */
+  /*                          Shadcn UI styles                         */
+  /* ----------------------------------------------------------------- */
+  /* https://ui.shadcn.com/docs/installation/manual */
+
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --primary: 16 100% 50%;
+    --primary-foreground: 0, 0%, 0%;
+
+    --secondary: 204 100% 41%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 47, 92%, 56%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --ring: 204 100% 41%;
+
+    --radius: 0.5rem;
+  }
+}
