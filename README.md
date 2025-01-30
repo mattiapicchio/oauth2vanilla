@@ -5,7 +5,9 @@
 [env.local](./env.local)
 
 `NEXT_PUBLIC_GCP_CLIENT_ID=`
+
 `NEXT_PUBLIC_AUTH_REDIRECT_URI=`
+
 `NEXT_PUBLIC_AUTH_BASE_URL=`
 
 ## Development server
