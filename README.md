@@ -1,4 +1,4 @@
-# Oauth2.0 with Google - Vanilla JS
+# Oauth2.0 with Google - Vanilla
 
 ## Env variables
 
