@@ -8,10 +8,11 @@ type LoginProps = {
   className?: string
 }
 
+// TODO: customise Google Button
 export default function Login({ className }: LoginProps) {
   return (
     <div className={cn('flex', className)}>
-      <Button onClick={() => redirectToGoogleAuth()}>Login</Button>
+      <Button onClick={() => redirectToGoogleAuth()}>Login with Google</Button>
     </div>
   )
 }
