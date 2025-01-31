@@ -49,8 +49,31 @@ export const handleOAuthCallback = () => {
     document.cookie = `access_token=${params['access_token']}; Secure; SameSite=Strict; Path=/;`
 
     // TODO: add sample request to verify flow
-    // trySampleRequest();
+    // Make a sample request to get the user's email
+    trySampleRequest(params['access_token'])
   } else {
     console.warn('State mismatch. Possible CSRF attack')
+  }
+}
+
+const trySampleRequest = async (accessToken: string) => {
+  try {
+    const response = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      console.log('User email:', data.email)
+    } else if (response.status === 401) {
+      // Token invalid, so prompt for user permission.
+      console.warn('Token invalid, please sign in again.')
+    } else {
+      console.error('Error fetching user email:', response.statusText)
+    }
+  } catch (error) {
+    console.error('Error fetching user email:', error)
   }
 }
