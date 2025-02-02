@@ -25,6 +25,10 @@ export const redirectToGoogleAuth = () => {
 
 // `https://oauth2.googleapis.com/token`.
 
+// https://github.com/vercel/next.js/discussions/49465
+// The fragment part of a URL, also known as anchor, is not part of the path.
+// There's one more thing to consider with the fragment/anchor/hash. It is not shared with the server. When you make a request, the browser removes it from the url, so a server component won't ever see it, unless you share it as queries, or within the body of a POST request, for instance.
+
 export const handleOAuthCallback = () => {
   if (typeof window === 'undefined') return
 
