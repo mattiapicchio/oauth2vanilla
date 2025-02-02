@@ -11,21 +11,15 @@ export const validateOAuthSession = async ({
 }) => {
   if (!code || !state) return
 
-  console.log('activeOauthState', activeOauthState)
-
   if (state === activeOauthState) {
-    console.log('valid!!')
-
     // Exchange the authorization code for an access token
-    exchangeCodeForToken(code)
+    return await exchangeCodeForToken(code)
   } else {
     console.warn('State mismatch. Possible CSRF attack')
   }
 }
 
 const exchangeCodeForToken = async (code: string) => {
-  'use server'
-
   const clientId = `${process.env.NEXT_PUBLIC_GCP_CLIENT_ID}`
   const clientSecret = `${process.env.NEXT_PUBLIC_GCP_CLIENT_SECRET}`
   const redirectUri = `${process.env.NEXT_PUBLIC_AUTH_REDIRECT_URI}`
@@ -49,10 +43,13 @@ const exchangeCodeForToken = async (code: string) => {
 
     if (response.ok) {
       const data = await response.json()
-      console.log('Access token:', data.access_token)
-      // Save the access token to a secure cookie
-      // Make a sample request to get the user's email
-      trySampleRequest(data.access_token)
+
+      if (process.env.NODE_ENV === 'development') {
+        // Make a sample request to get the user's email
+        trySampleRequest(data.access_token)
+      }
+
+      return data.access_token
     } else {
       console.error('Error exchanging code for token:', response.statusText)
     }
