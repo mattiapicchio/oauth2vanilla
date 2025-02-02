@@ -1,8 +1,8 @@
 'use client'
 
 import { Button } from '@/components/Button'
-import { redirectToGoogleAuth } from '@/features/auth/googleAuth'
 import { cn } from '@/utils/cn'
+import { redirectToGoogleAuth } from '../googleAuthRedirect'
 
 type LoginProps = {
   className?: string
