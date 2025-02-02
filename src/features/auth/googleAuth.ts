@@ -1,62 +1,63 @@
-import { generateCryptoRandomValue } from '@/utils/cryptoUtils'
+'use server'
 
-const authBaseUrl = `${process.env.NEXT_PUBLIC_AUTH_BASE_URL}`
+export const validateOAuthSession = async ({
+  state,
+  code,
+  activeOauthState,
+}: {
+  code: string
+  state: string
+  activeOauthState?: string
+}) => {
+  if (!code || !state) return
 
-export const redirectToGoogleAuth = () => {
-  const clientId = `${process.env.NEXT_PUBLIC_GCP_CLIENT_ID}`
-  const redirectUri = `${process.env.NEXT_PUBLIC_AUTH_REDIRECT_URI}`
-  const responseType = 'token'
-  const scope = 'openid email profile'
-  const state = generateCryptoRandomValue()
-  const prompt = 'consent'
+  console.log('activeOauthState', activeOauthState)
 
-  // Save the state value in localStorage to validate the auth flow is not tampered with
-  localStorage.setItem('oauth_state', state)
+  if (state === activeOauthState) {
+    console.log('valid!!')
 
-  const authUrl = `${authBaseUrl}?client_id=${encodeURIComponent(
-    clientId,
-  )}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${encodeURIComponent(
-    responseType,
-  )}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}&prompt=${encodeURIComponent(prompt)}`
-
-  // Redirect the user to Google's OAuth 2.0 endpoint
-  window.location.href = authUrl
-}
-
-// `https://oauth2.googleapis.com/token`.
-
-// https://github.com/vercel/next.js/discussions/49465
-// The fragment part of a URL, also known as anchor, is not part of the path.
-// There's one more thing to consider with the fragment/anchor/hash. It is not shared with the server. When you make a request, the browser removes it from the url, so a server component won't ever see it, unless you share it as queries, or within the body of a POST request, for instance.
-
-export const handleOAuthCallback = () => {
-  if (typeof window === 'undefined') return
-
-  const hash = window.location.hash.substring(1) // Remove the '#' character
-
-  if (!hash) {
-    return
-  }
-
-  const params: { [key: string]: string | null } = {}
-
-  const regex = /([^&=]+)=([^&]*)/g
-  let m
-  while ((m = regex.exec(hash)) !== null) {
-    params[decodeURIComponent(m[1])] = decodeURIComponent(m[2])
-  }
-  console.log('result', params)
-
-  const activeOauthState = localStorage.getItem('oauth_state')
-  if (params['state'] === activeOauthState && params['access_token']) {
-    // TODO: change this to a HttpOnly cookie
-    document.cookie = `access_token=${params['access_token']}; Secure; SameSite=Strict; Path=/;`
-
-    // TODO: add sample request to verify flow
-    // Make a sample request to get the user's email
-    trySampleRequest(params['access_token'])
+    // Exchange the authorization code for an access token
+    exchangeCodeForToken(code)
   } else {
     console.warn('State mismatch. Possible CSRF attack')
+  }
+}
+
+const exchangeCodeForToken = async (code: string) => {
+  'use server'
+
+  const clientId = `${process.env.NEXT_PUBLIC_GCP_CLIENT_ID}`
+  const clientSecret = `${process.env.NEXT_PUBLIC_GCP_CLIENT_SECRET}`
+  const redirectUri = `${process.env.NEXT_PUBLIC_AUTH_REDIRECT_URI}`
+  const tokenUrl = 'https://oauth2.googleapis.com/token'
+
+  const params = new URLSearchParams()
+  params.append('code', code)
+  params.append('client_id', clientId)
+  params.append('client_secret', clientSecret)
+  params.append('redirect_uri', redirectUri)
+  params.append('grant_type', 'authorization_code')
+
+  try {
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Access token:', data.access_token)
+      // Save the access token to a secure cookie
+      // Make a sample request to get the user's email
+      trySampleRequest(data.access_token)
+    } else {
+      console.error('Error exchanging code for token:', response.statusText)
+    }
+  } catch (error) {
+    console.error('Error exchanging code for token:', error)
   }
 }
 
